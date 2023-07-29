@@ -1,0 +1,6 @@
+coco_caption
+.vscode
+.idea
+__pycache__
+data/*
+coco_train
