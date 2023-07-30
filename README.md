@@ -38,7 +38,7 @@ We take MSCOCO Dataset and GCC external corpus as an example.
     ```
     python preprocess/external/gcc_external_caption.py
     ```
-* Then generate aggregated textual embeddings: GCC -> MSCOCO.
+* Then generate aggregated textual embeddings.
     ```
     python preprocess/generate_embedding.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/coco/coco_ViT-L_14_train_captions.pkl --image_dataset coco --caption_corpus coco --t 100
    python preprocess/generate_embedding.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/external/gcc_ViT-L_14_external_captions.pkl --image_dataset coco --caption_corpus gcc --t 175
