@@ -15,7 +15,7 @@ Unsupervised data preprocess for training, index by img not caption
 
 def main(clip_model_type: str, out_path: str, img_path: str, cap_path: str, img_data: str, cap_data: str, t: int):
     clip_model_name = clip_model_type.replace('/', '_')
-    out_path += "/{}_image_{}_corpus_{}_{}.pkl".format(img_data, cap_data, clip_model_name, t)
+    out_path += "/{}_images_{}_captions_{}_{}.pkl".format(img_data, cap_data, clip_model_name, t)
     print("saving path:{}".format(out_path))
 
     with open(img_path, 'rb') as f:
@@ -71,7 +71,7 @@ def main(clip_model_type: str, out_path: str, img_path: str, cap_path: str, img_
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--clip_model_type', default="ViT-L/14", choices=('ViT-L/14', 'RN50x4', 'ViT-B/32'))
-    parser.add_argument('--output_dir', default="/data/external/pair", type=str, help="output folder path")
+    parser.add_argument('--output_dir', default="/data/coco", type=str, help="output folder path")
     parser.add_argument('--image_pkl', required=True, type=str, help="path to image embedding pkl")
     parser.add_argument('--caption_pkl', required=True, type=str, help="path to caption embedding pkl")
     parser.add_argument('--image_dataset', default="coco", type=str, help="image dataset name")
