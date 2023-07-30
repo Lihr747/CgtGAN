@@ -45,10 +45,10 @@ def make_data_loader(args, mode, is_distributed=True, is_train=True):
         # Main Generator dataloader
         image_dataset = PairsFeatures(args.data_train)
 
-        images_per_gpu = args.per_gpu_train_batch_size
+        images_per_gpu = args.batch_size
         images_per_batch = images_per_gpu * get_world_size()
         iters_per_batch = len(image_dataset) // images_per_batch
-        num_iters = iters_per_batch * args.num_train_epochs  
+        num_iters = iters_per_batch * args.epochs
 
         image_sampler = make_data_sampler(image_dataset, shuffle, is_distributed)
 
@@ -89,7 +89,7 @@ def make_data_loader(args, mode, is_distributed=True, is_train=True):
             raise ValueError
 
         shuffle = False
-        images_per_gpu = args.per_gpu_eval_batch_size
+        images_per_gpu = args.batch_size
 
         sampler = make_data_sampler(dataset, shuffle, is_distributed)
         data_loader = torch.utils.data.DataLoader(
@@ -187,7 +187,7 @@ def train(image_dataloader, text_dataloader, val_dataloader, generator, discrimi
         )
 
     t_total = len(image_dataloader) // args.gradient_accumulation_steps \
-                  * args.num_train_epochs 
+                  * args.epochs
 
     no_decay = ['bias', 'LayerNorm.weight']
 
@@ -226,10 +226,10 @@ def train(image_dataloader, text_dataloader, val_dataloader, generator, discrimi
     optimizer_D.zero_grad()
 
     logger.info("***** Running training *****")
-    logger.info("  Epoch number = %d", args.num_train_epochs)
-    logger.info("  Batch size per GPU = %d", args.per_gpu_train_batch_size)
+    logger.info("  Epoch number = %d", args.epochs)
+    logger.info("  Batch size per GPU = %d", args.batch_size)
     logger.info("  Total train batch size (w. parallel, & accumulation) = %d",
-                args.per_gpu_train_batch_size * get_world_size() * args.gradient_accumulation_steps)
+                args.batch_size * get_world_size() * args.gradient_accumulation_steps)
     logger.info("  Gradient Accumulation steps = %d", args.gradient_accumulation_steps)
     logger.info("  Total optimization steps = %d", t_total)
 
@@ -261,7 +261,7 @@ def train(image_dataloader, text_dataloader, val_dataloader, generator, discrimi
         get_critic_score = discriminator.get_score
     
 
-    for epoch in range(int(args.num_train_epochs)):
+    for epoch in range(int(args.epochs)):
         if args.distributed:
             image_dataloader.sampler.set_epoch(epoch)
             text_dataloader.sampler.set_epoch(epoch)
@@ -313,6 +313,7 @@ def train(image_dataloader, text_dataloader, val_dataloader, generator, discrimi
             torch.nn.utils.clip_grad_norm_(discriminator.parameters(), args.max_grad_norm)
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 global_step += 1
+                optimizer_D.step()
                 scheduler_D.step()
                 discriminator.zero_grad()
 
@@ -486,10 +487,8 @@ def main():
     parser.add_argument("--do_train", action='store_true', help="Whether to run training.")
     parser.add_argument("--do_infer", action='store_true', help="Whether to run inference.")
     parser.add_argument("--do_eval", action='store_true', help="Whether to run evaluation.")
-    parser.add_argument("--per_gpu_train_batch_size", default=64, type=int,
-                        help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--per_gpu_eval_batch_size", default=32, type=int,
-                        help="Batch size per GPU/CPU for evaluation.")
+    parser.add_argument("--batch_size", default=64, type=int,
+                        help="Batch size per GPU/CPU for training and evaluation.")
     parser.add_argument("--num_workers", default=4, type=int, help="Workers in dataloader.")
     # global setting
     parser.add_argument("--generator_init", type=str, default='', help="Generator checkpoint.")
@@ -513,7 +512,7 @@ def main():
     parser.add_argument("--max_grad_norm", default=1.0, type=float, help="Max gradient norm.")
     parser.add_argument("--warmup_steps", default=150, type=int, help="lr linear warmup.")
     parser.add_argument("--scheduler", default='constant', type=str, help="constant or linear")
-    parser.add_argument("--num_train_epochs", default=50, type=int,
+    parser.add_argument("--epochs", default=50, type=int,
                         help="Total number of training epochs to perform.")
     parser.add_argument('--logging_steps', type=int, default=25, help="Log every X steps.")
     parser.add_argument("--evaluate_during_training", type=bool, default=True,
