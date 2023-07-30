@@ -1,126 +1,104 @@
-# SCSTClipCap
-## DataSet
-### Image Set
-* COCO image:
-    * annotations: download from [OSCAR](https://github.com/microsoft/Oscar/blob/master/DOWNLOAD.md), i.e., [coco_caption](https://biglmdiag.blob.core.windows.net/oscar/datasets/coco_caption.zip) note: use azcopy for faster speed. 
-    * images: [train](http://images.cocodataset.org/zips/train2014.zip) / [val/test](http://images.cocodataset.org/zips/val2014.zip) 
-* Flickr30K image:
-    * annotations: download from [Deep Visual-Semantic Alignments for Generating Image Descriptions](https://cs.stanford.edu/people/karpathy/deepimagesent/), i.e., [JSON_format](https://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip), then convert to same format as coco by `data_preprocess/convert_flickr30k_to_coco_format.py`.
-    * images: [train/val/test](https://www.kaggle.com/datasets/hsankesara/flickr-image-dataset)
-### Sentence Corpus
-* ShutterStock
-    * download from [UIC](https://github.com/fengyang0317/unsupervised_captioning/issues/42)
-* Google Conceptual Captions
-    * download from [GCC - Train_GCC-training.tsv](https://ai.google.com/research/ConceptualCaptions/download)
-* MSCOCO & Flickr30k
-    * training split of annoations
+# CLIP-guided text GAN
+Code for our paper: [*CgT-GAN: CLIP-guided Text GAN for Image Captioning](https://arxiv.org/abs/2211.09778). (挂出来改一下链接)
 
-## Data Pre-processing
-### Image Set
-* extract training image offline feature
+All pre-processed data and pretrained models are released in [BaiduPan](https://pan.baidu.com/s/1Og1PPOOdDFw7jMnG0W07Jw?pwd=s5wk).
+
+## Dataset
+All data are placed in ~/data as an example.
+### MSCOCO Dataset
+1. Download COCO images: [train](http://images.cocodataset.org/zips/train2014.zip) & [val/test](http://images.cocodataset.org/zips/val2014.zip) , put train2014 and val2014 folders in
+~/data/coco (coco root directory).
+2. Download COCO annotations: [annotations](https://biglmdiag.blob.core.windows.net/oscar/datasets/coco_caption.zip), put all json files in ~/data/coco/annotations.
+
+Example of the COCO root directory folder:
+```
+./data/coco
+--train2014
+--val2014
+--annotations
+```
+### Flickr30K Dataset
+1. Download images: [train/val/test](https://www.kaggle.com/datasets/hsankesara/flickr-image-dataset), put flickr30k_images folder in ~/data/Flickr30k.
+2. Download annotations: [annotations](https://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip), put all json files in ~/data/Flickr30k/annotations.
+### Text Corpus
+* ShutterStock : download from [UIC](https://github.com/fengyang0317/unsupervised_captioning/issues/42)
+* Google Conceptual Captions : download from [Train_GCC-training.tsv](https://ai.google.com/research/ConceptualCaptions/download)   
+
+Place all externel data in ~/data/externel for subsequent processing.
+## Data_Preprocess
+
+We take MSCOCO Dataset and GCC external corpus as an example.
+* Extract clip embeddings for COCO images and captions. All extracted embedding pkl files will be saved in ~/data/coco.
     ```
-    python data_preprocess/parse_coco_unsupervised.py
-    python data_preprocess/parse_flickr30k_unsupervised.py
+    python preprocess/coco/coco_train_image.py
+    python preprocess/coco/coco_train_caption.py
+    python preprocess/coco/coco_val-test.py
     ```
-* build testing feature
+* Extract clip embeddings for GCC captions. The pkl files will be saved in ~/data/external.
     ```
-    python data_preprocess/parse_coco_val.py
-    python data_preprocess/parse_flickr30k_val.py
+    python preprocess/external/gcc_external_caption.py
     ```
-* NOTE: remember to change `mode`, `out_path`.
-### Sentence Corpus
-* build pkl
-    * unsupervised
-        ```
-        python data_preprocess/parse_shutter_external_data.py
-        python data_preprocess/parse_GCC_external_data_filter_short_v2.py
-        python data_preprocess/parse_MSCOCO_external_data_first_cased.py
-        ```
-    * unpaired
-        ```
-        python data_preprocess/parse_MSCOCO_external_data_first_cased_for_unpaired_training.py
-        python data_preprocess/parse_flickr30k_external_data_first_cased_for_unpaired_training.py
-        ```
-## Generator Initialization (Optional)
-* select training set
+* Then generate aggregated textual embeddings: GCC -> MSCOCO.
     ```
-    data_preprocess/initialization_pretrain_split.py
+    python preprocess/generate_embedding.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/coco/coco_ViT-L_14_train_captions.pkl --image_dataset coco --caption_corpus coco --t 100
+   python preprocess/generate_embedding.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/external/gcc_ViT-L_14_external_captions.pkl --image_dataset coco --caption_corpus gcc --t 175
     ```
-    * NOTE: select correct `out_file_name` and `pretrain_corpus`
-* generator initialization (MSCOCO <-> SS as an example, val and test on MSCOCO dataset)
-    ```bash
-    gpus=3
+## Initialization
+* Initialize model using COCO Captions:
 
-    method_id=init_training_SS_wo_normalize_0.3_1.0
-
-    output_dir=./data1/output/UIC/SS_MSCOCO_init/$method_id
-
-    mkdir $output_dir
-
-    CUDA_VISIBLE_DEVICES=$gpus
-
-    CUDA_VISIBLE_DEVICES=$gpus nohup python -u train_for_init_fix_concate_bug.py \
-    --data ./data1/coco/external/shutter_pretrain_split_ViT-B_32_train.pkl \
-    --data_val ./data1/coco/oscar_split_ViT-B_32_val.pkl \
-    --data_test ./data/coco/oscar_split_ViT-B_32_test.pkl \
-    --image_feature_file ./data1/coco/oscar_split_ViT-B_32_train_unsupervised.pkl \
-    --output_dir $output_dir --do_train \
-    --learning_rate 0.00002 \
-    #--warmup_steps 500 \
-    --evaluate_during_training \
-    --num_train_epochs 2 \
-    --save_steps 400 \
-    --lambda1 0.3 \
-    --lambda2 1.0 \
-    --sigma 0.1 \
-    > $output_dir/nohup.out &
-    ```
-
-## GAN Training
-* MSCOCO <->
-```bash
-gpus=3,5,6,7
-
-method_id=SS_MSCOCO_constant_sch_1000_linear_clip_0.5_with_MMD_init_ckpt_2400_no_cat_bug # not using beam search
-
-output_dir=./data1/output/UIC/SS_MSCOCO/$method_id
-
-mkdir $output_dir
-
-CUDA_VISIBLE_DEVICES=$gpus
-
+```
+mkdir ./initialization/coco
+python initialization.py --output_dir ./initialization/coco --data ./data/coco/coco_ViT-L_14_train_captions.pkl
+```
+* Initialize model using GCC Captions:
+```
+mkdir ./initialization/gcc
+python initialization.py --output_dir ./initialization/gcc --data ./data/external/gcc_ViT-L_14_external_captions.pkl
+```
+## Training
+* Training model under MSCOCO images <-> MSCOCO captions setting:
+```
+gpus=0,1
+mkdir ./output/coco
 CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
---master_port 29502 \
---nproc_per_node 4 SCST_caption_with_init_fix_concate_bug.py \
---data ./data1/coco/oscar_split_ViT-B_32_train_unsupervised.pkl \
---data_val ./data1/coco/oscar_split_ViT-B_32_val.pkl \
---data_test ./data1/coco/oscar_split_ViT-B_32_test.pkl \
---external_corpus data/coco/external/shutter_cleaned_sentences.pkl \
---output_dir $output_dir --do_train \
---per_gpu_train_batch_size 4 \
---per_gpu_eval_batch_size 2 \
---scheduler constant \
---learning_rate 0.00001 \
---evaluate_during_training \
---num_train_epochs 6 \
---save_steps 200 \
---use_adv_training \
---gan_warm_steps 1000 \
---generator_init_ckpt data1/output/UIC/SS_MSCOCO_init/init_training_SS_wo_normalize_0.5_0.1/checkpoint-0-2400/model.pt \
---seed 0 \
-> $output_dir/nohup.out &
+--master_port 17527 \
+--nproc_per_node 2 cgtgan.py \
+--data_train ./data/coco/coco_image_coco_caption_ViT-L-14_100.pkl \
+--data_val ./data/coco/coco_ViT-L_14_val.pkl \
+--data_test ./data/coco/coco_ViT-L_14_test.pkl \
+--text_corpus ./data/coco/coco_train_sentences.pkl \
+--gt_val ./data/coco/annotations/val_caption_coco_format.json \
+--gt_test ./data/coco/annotations/test_caption_coco_format.json \
+--output_dir ./output/coco --do_train \
+--generator_init ./initialization/coco/model.pt \
+--epochs 50 \
+> coco.out &
+```
+* Training model under MSCOCO images <-> GCC captions setting:
+```
+gpus=0,1
+mkdir ./output/gcc
+CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
+--master_port 17528 \
+--nproc_per_node 2 cgtgan.py \
+--data_train ./data/external/coco_image_gcc_caption_ViT-L-14_175.pkl \
+--data_val ./data/coco/coco_ViT-L_14_val.pkl \
+--data_test ./data/coco/coco_ViT-L_14_test.pkl \
+--text_corpus ./data/external/gcc_external_sentences.pkl \
+--gt_val ./data/coco/annotations/val_caption_coco_format.json \
+--gt_test ./data/coco/annotations/test_caption_coco_format.json \
+--output_dir ./output/gcc --do_train \
+--generator_init ./initialization/gcc/model.pt \
+--epochs 80 \
+> gcc.out &
+```
+## Evaluation
+* Test best model on MSCOCO test set:
+```
+python -u cgtgan.py \
+--data_test ./data/coco/coco_ViT-L_14_test.pkl \
+--gt_test ./data/coco/annotations/test_caption_coco_format.json \
+--output_dir ./output/coco --do_eval \
+--generator_init ./output/coco/best/model.pt 
 ```
 
-## Tools
-* plot
-    * curve
-    * hist
-* visualize prefix
-    * predict with three distance
-* visualize fititious embedding
-    * save pkl
-    * Clipig
-## Acknowledge & Reference
-* Clipcap
-* OSCAR
-* Clipig
