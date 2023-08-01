@@ -47,30 +47,28 @@ We take MSCOCO Dataset and GCC external corpus as an example.
 * Initialize model using COCO Captions:
 
 ```
-mkdir ./initialization/coco
-python initialization.py --output_dir ./initialization/coco --data ./data/coco/coco_ViT-L_14_train_captions.pkl
+python initialization.py --output_dir path/to/save --data ./data/coco/coco_ViT-L_14_train_captions.pkl
 ```
 * Initialize model using GCC Captions:
 ```
-mkdir ./initialization/gcc
-python initialization.py --output_dir ./initialization/gcc --data ./data/external/gcc_ViT-L_14_external_captions.pkl
+python initialization.py --output_dir path/to/save --data ./data/external/gcc_ViT-L_14_external_captions.pkl
 ```
 ## Training
 * Training model under MSCOCO images <-> MSCOCO captions setting:
 ```
 gpus=0,1
-mkdir ./output/coco
 CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 --master_port 17527 \
 --nproc_per_node 2 cgtgan.py \
---data_train ./data/coco/coco_image_coco_caption_ViT-L-14_100.pkl \
+--output_dir path/to/save \
+--generator_init path/to/init/model \
+--data_train ./data/coco/coco_images_coco_captions_ViT-L_14_100.pkl \
 --data_val ./data/coco/coco_ViT-L_14_val.pkl \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
 --text_corpus ./data/coco/coco_train_sentences.pkl \
 --gt_val ./data/coco/annotations/val_caption_coco_format.json \
 --gt_test ./data/coco/annotations/test_caption_coco_format.json \
---output_dir ./output/coco --do_train \
---generator_init ./initialization/coco/model.pt \
+--do_train \
 --epochs 50 \
 > coco.out &
 ```
@@ -81,14 +79,15 @@ mkdir ./output/gcc
 CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 --master_port 17528 \
 --nproc_per_node 2 cgtgan.py \
---data_train ./data/external/coco_image_gcc_caption_ViT-L-14_175.pkl \
+--output_dir path/to/save \
+--generator_init path/to/init/model \
+--data_train ./data/external/coco_images_gcc_captions_ViT-L_14_175.pkl \
 --data_val ./data/coco/coco_ViT-L_14_val.pkl \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
 --text_corpus ./data/external/gcc_external_sentences.pkl \
 --gt_val ./data/coco/annotations/val_caption_coco_format.json \
 --gt_test ./data/coco/annotations/test_caption_coco_format.json \
---output_dir ./output/gcc --do_train \
---generator_init ./initialization/gcc/model.pt \
+--do_train \
 --epochs 80 \
 > gcc.out &
 ```
@@ -96,9 +95,10 @@ CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 * Test best model on MSCOCO test set:
 ```
 python -u cgtgan.py \
+--output_dir path/to/save \
+--generator_init path/to/best/model \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
 --gt_test ./data/coco/annotations/test_caption_coco_format.json \
---output_dir ./output/coco --do_eval \
---generator_init ./output/coco/best/model.pt 
+--do_eval \
 ```
 
