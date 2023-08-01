@@ -584,10 +584,7 @@ def main():
         generator_checkpoint = args.generator_init
         generator = ClipCaptionModel(prefix_length, clip_length=args.prefix_length_clip, prefix_size=prefix_dim,
                                  num_layers=args.num_layers, mapping_type=args.mapping_type)
-        
-        total = sum([param.nelement() for param in generator.parameters()])
-        print("Number of parameter: %.2fM" % (total))
-        
+    
         if generator_checkpoint != "":
             logger.info(f"loading generator from {generator_checkpoint}")
             state_dict = torch.load(generator_checkpoint, map_location=torch.device('cpu'))
