@@ -30,18 +30,18 @@ Place all externel data in ~/data/externel for subsequent processing.
 We take MSCOCO Dataset and GCC external corpus as an example.
 * Extract clip embeddings for COCO images and captions. All extracted embedding pkl files will be saved in ~/data/coco.
     ```
-    python preprocess/coco/coco_train_image.py
-    python preprocess/coco/coco_train_caption.py
+    python preprocess/coco/coco_train_images.py
+    python preprocess/coco/coco_train_captions.py
     python preprocess/coco/coco_val-test.py
     ```
 * Extract clip embeddings for GCC captions. The pkl files will be saved in ~/data/external.
     ```
-    python preprocess/external/gcc_external_caption.py
+    python preprocess/external/gcc_external_captions.py
     ```
 * Then generate aggregated textual embeddings.
     ```
-    python preprocess/generate_embedding.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/coco/coco_ViT-L_14_train_captions.pkl --image_dataset coco --caption_corpus coco --t 100
-   python preprocess/generate_embedding.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/external/gcc_ViT-L_14_external_captions.pkl --image_dataset coco --caption_corpus gcc --t 175
+    python preprocess/generate_embeddings.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/coco/coco_ViT-L_14_train_captions.pkl --image_dataset coco --caption_corpus coco --t 100
+   python preprocess/generate_embeddings.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/external/gcc_ViT-L_14_external_captions.pkl --image_dataset coco --caption_corpus gcc --t 175
     ```
 ## Initialization
 * Initialize model using COCO Captions:
