@@ -41,6 +41,7 @@ def main(clip_model_type: str, f30k_path: str):
         with torch.no_grad():
             prefix = clip_model.encode_image(image).cpu()
         all_embeddings.append(prefix)
+        embedding_id2image_id.append(img_id)
 
     all_captions = [{"image_id":embedding_id2image_id[i], "clip_embedding":i, "caption":[]} for i in range(len(embedding_id2image_id))]
 

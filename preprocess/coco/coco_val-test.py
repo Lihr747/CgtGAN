@@ -62,7 +62,7 @@ def main(clip_model_type: str, coco_path: str):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--clip_model_type', default="ViT-B/32", choices=('ViT-L/14', 'RN50x4', 'ViT-B/32'))
+    parser.add_argument('--clip_model_type', default="ViT-L/14", choices=('ViT-L/14', 'RN50x4', 'ViT-B/32'))
     parser.add_argument('--coco_path', default="./data/coco", type=str, help="path to coco root directory")
     args = parser.parse_args()
     main(args.clip_model_type, args.coco_path)
