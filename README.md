@@ -92,13 +92,14 @@ CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 > gcc.out &
 ```
 ## Evaluation
-* Test best model on MSCOCO test set:
+* Test checkpoint on MSCOCO test set:
 ```
 python -u cgtgan.py \
 --output_dir path/to/save \
---generator_init path/to/best/model \
+--generator_init path/to/checkpoint \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
 --gt_test ./data/coco/annotations/test_caption_coco_format.json \
 --do_eval \
 ```
+
 
