@@ -43,7 +43,7 @@ def train(dataset, model: ClipCaptionModel, args):
     device = torch.device('cuda')
     batch_size = args.batch_size
     output_dir = args.output_dir
-    num_epochs = args.num_train_epochs
+    num_epochs = args.epochs
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     model = model.to(device)
@@ -80,13 +80,13 @@ def train(dataset, model: ClipCaptionModel, args):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', default='./data/coco/oscar_split_train.pkl')
+    parser.add_argument('--data', default='./data/coco/coco_ViT-L_14_train_captions.pkl')
     parser.add_argument('--output_dir', default='./checkpoints')
     parser.add_argument("--learning_rate", default=2e-5, type=float, help="The initial lr.")
     parser.add_argument("--weight_decay", default=0.05, type=float, help="Weight deay.")
     parser.add_argument("--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam.")
     parser.add_argument("--warmup_steps", default=5000, type=int, help="Linear warmup.")
-    parser.add_argument("--num_train_epochs", default=1, type=int, 
+    parser.add_argument("--epochs", default=1, type=int, 
                         help="Total number of training epochs to perform.")
     parser.add_argument('--seed', type=int, default=0, help="random seed for initialization.")
     parser.add_argument('--batch_size', type=int, default=16, help="The prefix seq length")
