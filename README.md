@@ -47,11 +47,11 @@ We take MSCOCO Dataset and GCC external corpus as an example.
 * Initialize model using COCO Captions:
 
 ```
-python initialization.py --output_dir path/to/save --data ./data/coco/coco_ViT-L_14_train_captions.pkl
+python initialization.py --output_dir path/to/save(folder) --data ./data/coco/coco_ViT-L_14_train_captions.pkl
 ```
 * Initialize model using GCC Captions:
 ```
-python initialization.py --output_dir path/to/save --data ./data/external/gcc_ViT-L_14_external_captions.pkl
+python initialization.py --output_dir path/to/save(folder) --data ./data/external/gcc_ViT-L_14_external_captions.pkl
 ```
 ## Training
 * Training model under MSCOCO images <-> MSCOCO captions setting:
@@ -60,8 +60,8 @@ gpus=0,1
 CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 --master_port 17527 \
 --nproc_per_node 2 cgtgan.py \
---output_dir path/to/save \
---generator_init path/to/init/model \
+--output_dir path/to/save(folder) \
+--generator_init path/to/init/model.pt \
 --data_train ./data/coco/coco_images_coco_captions_ViT-L_14_100.pkl \
 --data_val ./data/coco/coco_ViT-L_14_val.pkl \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
@@ -79,8 +79,8 @@ mkdir ./output/gcc
 CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 --master_port 17528 \
 --nproc_per_node 2 cgtgan.py \
---output_dir path/to/save \
---generator_init path/to/init/model \
+--output_dir path/to/save(folder) \
+--generator_init path/to/init/model.pt \
 --data_train ./data/external/coco_images_gcc_captions_ViT-L_14_175.pkl \
 --data_val ./data/coco/coco_ViT-L_14_val.pkl \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
@@ -95,8 +95,8 @@ CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 * Test checkpoint on MSCOCO test set:
 ```
 python -u cgtgan.py \
---output_dir path/to/save \
---generator_init path/to/checkpoint \
+--output_dir path/to/save(folder) \
+--generator_init path/to/checkpoint/model.pt \
 --data_test ./data/coco/coco_ViT-L_14_test.pkl \
 --gt_test ./data/coco/annotations/test_caption_coco_format.json \
 --do_eval \
