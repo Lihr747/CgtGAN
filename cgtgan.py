@@ -476,13 +476,13 @@ def main():
     parser = argparse.ArgumentParser()
 
     # directory settings
-    parser.add_argument('--data_train', type=str, required=True, help="path to pair embedding file")
-    parser.add_argument('--text_corpus', type=str, required=True, help="path to text corpus file")
-    parser.add_argument('--data_val', type=str, required=True, help="path to val embedding file")
-    parser.add_argument('--data_test', type=str, required=True, help="path to test embedding file")
-    parser.add_argument('--gt_val', type=str, required=True, help="path to val json file")
-    parser.add_argument('--gt_test', type=str, required=True, help="path to test json file")
-    parser.add_argument('--output_dir', type=str, default='./output', help="path to output")
+    parser.add_argument('--data_train', type=str, default="", help="path to pair embedding file")
+    parser.add_argument('--text_corpus', type=str, default="", help="path to text corpus file")
+    parser.add_argument('--data_val', type=str, default="", help="path to val embedding file")
+    parser.add_argument('--data_test', type=str, default="", help="path to test embedding file")
+    parser.add_argument('--gt_val', type=str, default="", help="path to val json file")
+    parser.add_argument('--gt_test', type=str, default="", help="path to test json file")
+    parser.add_argument('--output_dir', type=str, default="", help="path to output")
     # operation settings
     parser.add_argument("--do_train", action='store_true', help="Whether to run training.")
     parser.add_argument("--do_infer", action='store_true', help="Whether to run inference.")
