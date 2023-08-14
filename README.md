@@ -1,10 +1,10 @@
 # CLIP-guided text GAN
-Code for our paper: [*CgT-GAN: CLIP-guided Text GAN for Image Captioning](https://arxiv.org/abs/2211.09778). (挂出来改一下链接)
+Code for our paper: [*CgT-GAN: CLIP-guided Text GAN for Image Captioning]
 
 All pre-processed data and pretrained models are released in [BaiduPan](https://pan.baidu.com/s/1Og1PPOOdDFw7jMnG0W07Jw?pwd=s5wk).
 
 ## Dataset
-All data are placed in ~/data as an example.
+All data will be placed in ~/data as an example.
 ### MSCOCO Dataset
 1. Download COCO images: [train](http://images.cocodataset.org/zips/train2014.zip) & [val/test](http://images.cocodataset.org/zips/val2014.zip) , put train2014 and val2014 folders in
 ~/data/coco (coco root directory).
@@ -44,12 +44,12 @@ We take MSCOCO Dataset and GCC external corpus as an example.
    python preprocess/generate_embeddings.py --image_pkl ./data/coco/coco_ViT-L_14_train_images.pkl --caption_pkl ./data/external/gcc_ViT-L_14_external_captions.pkl --image_dataset coco --caption_corpus gcc --t 175
     ```
 ## Initialization
-* Initialize model using COCO Captions:
+* Initialize generator using COCO Captions:
 
 ```
 python initialization.py --output_dir path/to/save/folder --data ./data/coco/coco_ViT-L_14_train_captions.pkl
 ```
-* Initialize model using GCC Captions:
+* Initialize generator using GCC Captions:
 ```
 python initialization.py --output_dir path/to/save/folder --data ./data/external/gcc_ViT-L_14_external_captions.pkl
 ```
@@ -92,7 +92,7 @@ CUDA_VISIBLE_DEVICES=$gpus nohup python -m torch.distributed.launch \
 > gcc.out &
 ```
 ## Evaluation
-* Test checkpoint on MSCOCO test set:
+* Test model checkpoint on MSCOCO test split:
 ```
 python -u cgtgan.py \
 --output_dir path/to/save/folder \
