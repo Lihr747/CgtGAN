@@ -1,5 +1,5 @@
 # CLIP-guided text GAN
-Code for our paper: **CgT-GAN: CLIP-guided Text GAN for Image Captioning**
+Code for our paper: [CgT-GAN: CLIP-guided Text GAN for Image Captioning](https://arxiv.org/abs/2308.12045)
 
 All pre-processed data and pretrained models are released in [BaiduPan](https://pan.baidu.com/s/1Og1PPOOdDFw7jMnG0W07Jw?pwd=s5wk).
 
