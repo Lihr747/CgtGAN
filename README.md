@@ -3,6 +3,8 @@ Code for our paper: [CgT-GAN: CLIP-guided Text GAN for Image Captioning](https:/
 
 All pre-processed data and pretrained models are released in [BaiduPan](https://pan.baidu.com/s/1Og1PPOOdDFw7jMnG0W07Jw?pwd=s5wk).
 
+The [paper](https://arxiv.org/abs/2308.12045) has been accepted by ACM MM 2023.
+
 ## Dataset
 All data will be placed in ~/data as an example.
 ### MSCOCO Dataset
