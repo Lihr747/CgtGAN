@@ -101,5 +101,14 @@ python -u cgtgan.py \
 --gt_test ./data/coco/annotations/test_caption_coco_format.json \
 --do_eval \
 ```
-
+## Cite
+```
+@article{2308.12045,
+Author = {Jiarui Yu and Haoran Li and Yanbin Hao and Bin Zhu and Tong Xu and Xiangnan He},
+Title = {CgT-GAN: CLIP-guided Text GAN for Image Captioning},
+Year = {2023},
+Eprint = {arXiv:2308.12045},
+Doi = {10.1145/3581783.3611891},
+}
+```
 
