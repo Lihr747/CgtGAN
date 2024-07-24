@@ -10,7 +10,7 @@ All data will be placed in ~/data as an example.
 ### MSCOCO Dataset
 1. Download COCO images: [train](http://images.cocodataset.org/zips/train2014.zip) & [val/test](http://images.cocodataset.org/zips/val2014.zip) , put train2014 and val2014 folders in
 ~/data/coco (coco root directory).
-2. Download COCO annotations: [annotations](https://pan.baidu.com/s/1FKm4Lud6ihIgR3Kenba5lg?pwd=k6a2), put all json files in ~/data/coco/annotations.
+2. Download COCO annotations: [BaiduPan](https://pan.baidu.com/s/1FKm4Lud6ihIgR3Kenba5lg?pwd=k6a2) or [GoogleDrive](https://drive.google.com/file/d/1Cs5gZR65aoailf5rJpPyiptHxkZwf-Pd/view?usp=drive_link), put all json files in ~/data/coco/annotations.
 
 Example of the COCO root directory folder:
 ```
